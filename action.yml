@@ -4,6 +4,8 @@ inputs:
   python-version:
     description: "Version range or exact version of a Python version to use."
     required: true
+  pre-install:
+    description: "Packages to pip install before running make install"
 runs:
   using: "composite"
   steps:
@@ -14,7 +16,7 @@ runs:
 
     - name: Install dependencies
       run: |
-        pip install poetry
+        pip install ${{ inputs.pre-install }}
         make install
       shell: bash
 
@@ -27,7 +29,7 @@ runs:
       shell: bash
 
     - name: Ensure package builds
-      run: poetry build
+      run: make build
       shell: bash
 
     - name: Upload coverage report to codecov
