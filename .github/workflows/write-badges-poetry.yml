@@ -1,0 +1,88 @@
+name: Write Badges
+on:
+  workflow_call:
+    inputs:
+      build_result:
+        required: true
+        type: string
+
+jobs:
+  write-badges:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure badges branch exists
+        uses: action-badges/create-orphan-branch@main
+        with:
+          branch-name: badges
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifact
+          pattern: coverage-*
+
+      - name: Merge coverage reports
+        run: |
+          npx merge-cobertura@latest -o merged-cov.xml \
+          $(find artifact -name '*coverage.xml' | \
+          awk '{printf "package" NR "=%s ", $0}')
+
+      - name: Set build status badge color
+        run: |
+          if [ "${{ inputs.build_result }}" == "success" ]; then
+            echo "color=brightgreen" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.build_result }}" == "failure" ]; then
+            echo "color=red" >> $GITHUB_OUTPUT
+          else
+            echo "color=lightgrey" >> $GITHUB_OUTPUT
+          fi
+        id: build-color
+
+      - name: Write build status badge
+        uses: action-badges/core@main
+        with:
+          badge-branch: badges
+          file-name: build-status.svg
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          label: build
+          message: "${{ inputs.build_result }}"
+          message-color: ${{ steps.build-color.outputs.color }}
+
+      - name: Write coverage badge
+        uses: action-badges/cobertura-coverage-xml-badges@main
+        with:
+          file-name: coverage.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          coverage-file-name: ./merged-cov.xml
+
+      - name: Write version badge
+        uses: action-badges/poetry-badges@main
+        with:
+          file-name: poetry-version.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: version
+
+      - name: Write license badge
+        uses: action-badges/poetry-badges@main
+        with:
+          file-name: poetry-license.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: license
+
+      - name: Write python version badge
+        uses: action-badges/poetry-badges@main
+        with:
+          file-name: poetry-python-version.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: dependency-version
+          dependency-type: dependencies
+          dependency: python
