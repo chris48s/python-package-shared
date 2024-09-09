@@ -25,7 +25,11 @@ runs:
       shell: bash
 
     - name: Run tests
-      run: make test
+      run: |
+        echo '# Tests' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        make test | tee -a $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
       shell: bash
 
     - name: Check coding standards
