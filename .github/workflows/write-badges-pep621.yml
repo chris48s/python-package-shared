@@ -5,7 +5,6 @@ on:
       build_result:
         required: true
         type: string
-    inputs:
       package_dir:
         required: true
         type: string
