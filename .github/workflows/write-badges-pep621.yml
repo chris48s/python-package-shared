@@ -24,9 +24,12 @@ jobs:
           branch-name: badges
 
       - name: Write version badge
-        uses: action-badges/python-dunder-version-badge@wip
+        uses: action-badges/python-dunder-version-badge@main
         with:
           file-name: package-version.svg
           badge-branch: badges
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           package-dir: '${{ inputs.package_dir }}'
+
+# TODO: factor out build + coverage
+# TODO: license badge
