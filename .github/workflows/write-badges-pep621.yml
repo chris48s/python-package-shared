@@ -1,0 +1,33 @@
+name: Write Badges
+on:
+  workflow_call:
+    inputs:
+      build_result:
+        required: true
+        type: string
+    inputs:
+      package_dir:
+        required: true
+        type: string
+
+jobs:
+  write-badges:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure badges branch exists
+        uses: action-badges/create-orphan-branch@main
+        with:
+          branch-name: badges
+
+      - name: Write version badge
+        uses: action-badges/python-dunder-version-badge@wip
+        with:
+          file-name: package-version.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          package-dir: '${{ inputs.package_dir }}'
