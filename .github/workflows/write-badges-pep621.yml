@@ -72,5 +72,18 @@ jobs:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           package-dir: '${{ inputs.package_dir }}'
 
-      # TODO: license
-      # TODO: python version
+      - name: Write license badge
+        uses: action-badges/pep621-badges@main
+        with:
+          file-name: package-license.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: license
+
+      - name: Write python version badge
+        uses: action-badges/pep621-badges@main
+        with:
+          file-name: package-python-version.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: python-version
