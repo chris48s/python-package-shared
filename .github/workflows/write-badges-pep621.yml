@@ -24,7 +24,7 @@ jobs:
           branch-name: badges
 
       - name: Write version badge
-        uses: action-badges/python-dunder-version-badge@main
+        uses: action-badges/python-dunder-version-badge@wip2
         with:
           file-name: package-version.svg
           badge-branch: badges
