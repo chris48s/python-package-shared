@@ -23,13 +23,54 @@ jobs:
         with:
           branch-name: badges
 
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifact
+          pattern: coverage-*
+
+      - name: Merge coverage reports
+        run: |
+          npx merge-cobertura@latest -o merged-cov.xml \
+          $(find artifact -name '*coverage.xml' | \
+          awk '{printf "package" NR "=%s ", $0}')
+
+      - name: Set build status badge color
+        run: |
+          if [ "${{ inputs.build_result }}" == "success" ]; then
+            echo "color=brightgreen" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.build_result }}" == "failure" ]; then
+            echo "color=red" >> $GITHUB_OUTPUT
+          else
+            echo "color=lightgrey" >> $GITHUB_OUTPUT
+          fi
+        id: build-color
+
+      - name: Write build status badge
+        uses: action-badges/core@main
+        with:
+          badge-branch: badges
+          file-name: build-status.svg
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          label: build
+          message: "${{ inputs.build_result }}"
+          message-color: ${{ steps.build-color.outputs.color }}
+
+      - name: Write coverage badge
+        uses: action-badges/cobertura-coverage-xml-badges@main
+        with:
+          file-name: coverage.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          coverage-file-name: ./merged-cov.xml
+
       - name: Write version badge
-        uses: action-badges/python-dunder-version-badge@wip2
+        uses: action-badges/python-dunder-version-badge@main
         with:
           file-name: package-version.svg
           badge-branch: badges
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           package-dir: '${{ inputs.package_dir }}'
 
-# TODO: factor out build + coverage
-# TODO: license badge
+      # TODO: license
+      # TODO: python version
