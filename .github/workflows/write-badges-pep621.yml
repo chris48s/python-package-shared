@@ -72,14 +72,13 @@ jobs:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           package-dir: '${{ inputs.package_dir }}'
 
-      # https://github.com/pypa/flit/issues/692
-      #- name: Write license badge
-      #  uses: action-badges/pep621-badges@main
-      #  with:
-      #    file-name: package-license.svg
-      #    badge-branch: badges
-      #    github-token: '${{ secrets.GITHUB_TOKEN }}'
-      #    integration: license
+      - name: Write license badge
+        uses: action-badges/pep621-badges@main
+        with:
+          file-name: package-license.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          integration: license
 
       - name: Write python version badge
         uses: action-badges/pep621-badges@main
